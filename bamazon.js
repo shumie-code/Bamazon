@@ -10,7 +10,7 @@ var connection = mysql.createConnection({
     //USERNAME
     user: "root",
     // PASSWORD
-    password: "shumie",
+    password: "Jordan9152!",
     // Database Used
     database: "bamazon_db"
 });
@@ -26,9 +26,11 @@ connection.connect(function(err) {
 function showProducts() {
     var query = "Select * FROM products";
     connection.query(query, function(err, res) {
+       
         if (err) throw err;
+        
         for (var i=0; 1 < res.length; i++) {
-            console.log("Product ID: " + res[i].item_id + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price);
+            console.log("Product ID: " + res[i].item_id + " || Department Name: " + res[i].department_name + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price);
         }
         // Finds product id and quantity for user
         findProducts();
@@ -60,17 +62,18 @@ function findProducts() {
             }
 
         }
-    }]).then(function(answer) {
+    ]).then(function(answer) {
 
         //Checks the database for the selected product
-        var query = "Select stock_quantity, price, product_sales, department_name FROM products WHERE ?";
-        connection.query(query, { item_id: answer.productID}, function(err, res) {
+        var query = "Select stock_quantity, price, product_name, department_name FROM products WHERE ?";
+        connection.query(query, {item_id: answer.productID}, function(err, res) {
             if (err) throw err;
 
             var available_stock = res[0].stock_quantity;
             var price_per_unit = res[0].price;
-            var productSales = res[0],product_sales;
-            var prodcutDepartment = res[0].department_name;
+            var productSales = res[0].product_name;
+            var productDepartment = res[0].department_name;
+            var productID = res[0].item_id;
 
             // Checks if there is enough inventory to process purchase
 
@@ -100,14 +103,11 @@ function completePurchase(availableStock, price, productsSales, prodcutDepartmen
     //Updates total product sales.
     var updateProductsSales = parseInt(productSales) + parseInt(totalPrice);
 
-    // Updates total products sales.
-    var updatedProductSales = parseInt(productSales) + parseInt(totalPrice);
-
     // Updates stock quantity on the database based on user's purchase.
     var query = "UPDATE products SET ? WHERE ?";
     connection.query(query, [{
         stock_quantity: updatedStockQuantity,
-        product_sales: updatedProductSales
+        product_name: updatedProductSales
 
     }, {
         item_id: selectedProductID
@@ -122,5 +122,42 @@ function completePurchase(availableStock, price, productsSales, prodcutDepartmen
         //Updates department revenue based on purchase.
         updateDepartmentRevenue(updatedProductSales, productDepartment);
         //Displays products so user can make a new selection.
-    }
-}
+    });
+};
+
+// Completes update to total sales for department on database.
+function updateDepartmentRevenue(updatedProductSales, prodcutDepartment) {
+
+    //Query database for total sales value for department.
+    var query = "Select total_sales FROM departments WHERE ?";
+    connection.query(query, { department_name: prodcutDepartment}, function(err, res) {
+
+        if (err) throw err;
+
+        var departmentSales = res[0].total_sales;
+
+        var updatedDepartmentSales = parseInt(departmentSales) + parseInt(updatedProductSales);
+
+        // Completes update to total sales for department
+
+        completeDepartmentSalesUpdate(updatedDepartmentSales, prodcutDepartment);
+
+    });
+};
+
+
+// Completes update to total sales for department on database
+function completeDepartmentSalesUpdate(updatedDepartmentSales, productDepartment) {
+
+    var query = "Update departments SET ? WHERE ?";
+    connection.query(query, [{
+        total_sales: updatedDepartmentSales
+    }, {
+        department_name: prodcutDepartment
+    }], function(err, res) {
+        if (err) throw err;
+
+        //Displays products so user can choose to make another purchase.
+        displayProducts();
+    });
+};
