@@ -30,7 +30,7 @@ function showProducts() {
         if (err) throw err;
         
         for (var i = 0; i < res.length; i++) {
-            console.log("Product ID: " + res[i].item_id + " || Department Name: " + res[i].department_name + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price + " || QTY: " + res[i].stock_quantity);
+            console.log("Product ID: " + res[i].item_id + " || Department Name: " + res[i].department_name + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price);
         }
         // Finds product id and quantity for user
         findProducts();
@@ -79,7 +79,7 @@ function findProducts() {
             if (available_stock >+ answer.productUnits) {
 
                 // Complete customer request for purchase
-                completePurchase(availble_stock, price_per_unit, productSales, prodcutDepartment, answer.productID, answer.productUnits);
+                completePurchase(available_stock, price_per_unit, productSales, productDepartment, answer.productID, answer.productUnits);
                 } else {
                     //Tells the user there isnt enough stock left
                     console.log("There isnt enough stock left sorry.");
@@ -92,15 +92,15 @@ function findProducts() {
 };
 
 // Complete user's request to purchase product
-function completePurchase(availableStock, price, productsSales, prodcutDepartment, selectedProductID, selectedProductUnits) {
+function completePurchase(availableStock, price, productSales, productDepartment, selectedProductID, selectedProductUnits) {
     // Update stock quantity once purchase complete.
-    var updatedStockQuantity = avaibleStock - selectedProductUnits; 
+    var updatedStockQuantity = availableStock - selectedProductUnits; 
 
     // Calculate total price for purchase based on unit price, and number of units.
     var totalPrice = price * selectedProductsUnits;
 
     //Updates total product sales.
-    var updateProductsSales = parseInt(productSales) + parseInt(totalPrice);
+    var updatedProductSales = parseInt(productSales) + parseInt(totalPrice);
 
     // Updates stock quantity on the database based on user's purchase.
     var query = "UPDATE products SET ? WHERE ?";
@@ -125,11 +125,11 @@ function completePurchase(availableStock, price, productsSales, prodcutDepartmen
 };
 
 // Completes update to total sales for department on database.
-function updateDepartmentRevenue(updatedProductSales, prodcutDepartment) {
+function updateDepartmentRevenue(updatedProductSales, productDepartment) {
 
     //Query database for total sales value for department.
     var query = "Select total_sales FROM departments WHERE ?";
-    connection.query(query, { department_name: prodcutDepartment}, function(err, res) {
+    connection.query(query, { department_name: productDepartment}, function(err, res) {
 
         if (err) throw err;
 
@@ -139,7 +139,7 @@ function updateDepartmentRevenue(updatedProductSales, prodcutDepartment) {
 
         // Completes update to total sales for department
 
-        completeDepartmentSalesUpdate(updatedDepartmentSales, prodcutDepartment);
+        completeDepartmentSalesUpdate(updatedDepartmentSales, productDepartment);
 
     });
 };
@@ -152,7 +152,7 @@ function completeDepartmentSalesUpdate(updatedDepartmentSales, productDepartment
     connection.query(query, [{
         total_sales: updatedDepartmentSales
     }, {
-        department_name: prodcutDepartment
+        department_name: productDepartment
     }], function(err, res) {
         if (err) throw err;
 
