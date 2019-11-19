@@ -29,8 +29,8 @@ function showProducts() {
        
         if (err) throw err;
         
-        for (var i=0; 1 < res.length; i++) {
-            console.log("Product ID: " + res[i].item_id + " || Department Name: " + res[i].department_name + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price);
+        for (var i = 0; i < res.length; i++) {
+            console.log("Product ID: " + res[i].item_id + " || Department Name: " + res[i].department_name + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price + " || QTY: " + res[i].stock_quantity);
         }
         // Finds product id and quantity for user
         findProducts();
@@ -66,14 +66,13 @@ function findProducts() {
 
         //Checks the database for the selected product
         var query = "Select stock_quantity, price, product_name, department_name FROM products WHERE ?";
-        connection.query(query, {item_id: answer.productID}, function(err, res) {
+        connection.query(query, { item_id: answer.productID}, function(err, res) {
             if (err) throw err;
 
             var available_stock = res[0].stock_quantity;
             var price_per_unit = res[0].price;
             var productSales = res[0].product_name;
             var productDepartment = res[0].department_name;
-            var productID = res[0].item_id;
 
             // Checks if there is enough inventory to process purchase
 
