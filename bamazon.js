@@ -30,7 +30,7 @@ function showProducts() {
         if (err) throw err;
         
         for (var i = 0; i < res.length; i++) {
-            console.log("Product ID: " + res[i].item_id + " || Department Name: " + res[i].department_name + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price);
+            console.log("Product ID: " + res[i].item_id + " || Department Name: " + res[i].department_name + " || Product Name: " + res[i].product_name + " || Price: " + res[i].price + " || QTY: " + res[i].stock_quantity);
         }
         // Finds product id and quantity for user
         findProducts();
@@ -40,11 +40,11 @@ function showProducts() {
 // Finds products quantity of items
 function findProducts() {
     inquirer.prompt([{
-        name: "product ID",
+        name: "productID",
         type: "input",
         message: "Enter product ID for item",
         validate: function(value) {
-            if (isNaN(value) === false) {
+            if (isNaN (value) === false) {
                 return true;
             }
             return false;
@@ -55,7 +55,7 @@ function findProducts() {
             type: "input",
             message: "How many units would you like?",
             validate: function(value) {
-                if (isNaN(value) === false) {
+                if (isNaN (value) === false) {
                     return true;
                 }
                 return false
@@ -66,8 +66,10 @@ function findProducts() {
 
         //Checks the database for the selected product
         var query = "Select stock_quantity, price, product_name, department_name FROM products WHERE ?";
-        connection.query(query, { item_id: answer.productID}, function(err, res) {
+        connection.query(query, {item_id: answer.productID}, function(err, res) {
+            console.log("The item id is , ",answer.productID)
             if (err) throw err;
+            console.log("The response is", res)
 
             var available_stock = res[0].stock_quantity;
             var price_per_unit = res[0].price;
@@ -77,6 +79,7 @@ function findProducts() {
             // Checks if there is enough inventory to process purchase
 
             if (available_stock >+ answer.productUnits) {
+                console.log("The product units answer is", answer.productUnits)
 
                 // Complete customer request for purchase
                 completePurchase(available_stock, price_per_unit, productSales, productDepartment, answer.productID, answer.productUnits);
@@ -93,11 +96,13 @@ function findProducts() {
 
 // Complete user's request to purchase product
 function completePurchase(availableStock, price, productSales, productDepartment, selectedProductID, selectedProductUnits) {
+    console.log("The selected product units are", selectedProductUnits)
     // Update stock quantity once purchase complete.
     var updatedStockQuantity = availableStock - selectedProductUnits; 
 
     // Calculate total price for purchase based on unit price, and number of units.
-    var totalPrice = price * selectedProductsUnits;
+    var totalPrice = price * selectedProductUnits;
+    
 
     //Updates total product sales.
     var updatedProductSales = parseInt(productSales) + parseInt(totalPrice);
