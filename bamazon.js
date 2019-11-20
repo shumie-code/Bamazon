@@ -165,9 +165,10 @@ function completeDepartmentSalesUpdate(updatedDepartmentSales, productDepartment
     }, {
         department_name: productDepartment
     }], function(err, res) {
+        
         if (err) throw err;
 
-        //Displays products so user can choose to make another purchase.
+        //Show products so user can choose to make another purchase.
         showProducts();
     });
 };
