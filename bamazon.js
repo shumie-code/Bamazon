@@ -44,10 +44,13 @@ function findProducts() {
         type: "input",
         message: "Enter product ID for item",
         validate: function(value) {
-            if (isNaN (value) === false) {
+            
+            if (isNaN(value) === false) {
+                
                 return true;
-            }
-            return false;
+          
+            } 
+            return false
         }
        
       },  {
@@ -55,30 +58,33 @@ function findProducts() {
             type: "input",
             message: "How many units would you like?",
             validate: function(value) {
-                if (isNaN (value) === false) {
+                
+                if (isNaN(value) === false) {
+                  
                     return true;
-                }
+                    
+                } 
                 return false
             }
 
-        }
-    ]).then(function(answer) {
+        
+    }]).then(function(answer) {
 
         //Checks the database for the selected product
-        var query = "Select stock_quantity, price, product_name, department_name FROM products WHERE ?";
+        var query = "Select stock_quantity, price, product_sales, department_name FROM products WHERE ?";
         connection.query(query, {item_id: answer.productID}, function(err, res) {
-            console.log("The item id is , ",answer.productID)
+     
             if (err) throw err;
-            console.log("The response is", res)
+           
 
             var available_stock = res[0].stock_quantity;
             var price_per_unit = res[0].price;
-            var productSales = res[0].product_name;
+            var productSales = res[0].product_sales;
             var productDepartment = res[0].department_name;
 
             // Checks if there is enough inventory to process purchase
 
-            if (available_stock >+ answer.productUnits) {
+            if (available_stock >= answer.productUnits) {
                 console.log("The product units answer is", answer.productUnits)
 
                 // Complete customer request for purchase
@@ -96,7 +102,7 @@ function findProducts() {
 
 // Complete user's request to purchase product
 function completePurchase(availableStock, price, productSales, productDepartment, selectedProductID, selectedProductUnits) {
-    console.log("The selected product units are", selectedProductUnits)
+
     // Update stock quantity once purchase complete.
     var updatedStockQuantity = availableStock - selectedProductUnits; 
 
@@ -111,7 +117,7 @@ function completePurchase(availableStock, price, productSales, productDepartment
     var query = "UPDATE products SET ? WHERE ?";
     connection.query(query, [{
         stock_quantity: updatedStockQuantity,
-        product_name: updatedProductSales
+        product_sales: updatedProductSales
 
     }, {
         item_id: selectedProductID
@@ -162,6 +168,6 @@ function completeDepartmentSalesUpdate(updatedDepartmentSales, productDepartment
         if (err) throw err;
 
         //Displays products so user can choose to make another purchase.
-        displayProducts();
+        showProducts();
     });
 };
