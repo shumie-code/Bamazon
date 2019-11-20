@@ -17,3 +17,6 @@ NPM
 INQUIRER
 MYSQL
 
+YOUTUBE :
+Click on link to watch a short video walkthrough of the application. 
+https://www.youtube.com/watch?v=hR6c5hY24eY&feature=youtu.be
